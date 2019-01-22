@@ -19,29 +19,15 @@
     <link href='https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/0.52.0/mapbox-gl.css' rel='stylesheet' />
     <script type="text/javascript" src="./echarts_layer.js"></script>
     <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiZ291YWNoIiwiYSI6ImNqcjdsZ3o0djAwMGczeHA4YmE3emU5ZGEifQ.MPYmwvvDO4WpGi6zrJQ32Q';
         var map = new mapboxgl.Map({
             container: 'container',
-            style: {
-                'version': 8,
-                'sources': {},
-                'layers': []
-            },
-            center: [0.9238313, 43.864227],
-
-            zoom: 5
+            style: 'mapbox://styles/mapbox/satellite-streets-v9',
+            center: [1.3689729, 44.4565006],
+            zoom: 7
         })
         map.addControl(new mapboxgl.NavigationControl())
         map.on('load', function () {
-            map.addSource('google.tile', {
-                'type': 'raster',
-                'tiles': ['https://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}'],
-                'tileSize': 256
-            })
-            map.addLayer({
-                'id': 'google',
-                'type': 'raster',
-                'source': 'google.tile'
-            })
 
             $.getJSON("output.json", function(data) {
 
@@ -64,29 +50,16 @@
                             color: '#fff'
                         }
                     },
-                    tooltip: {
-                        trigger: 'item'
-                    },
-                    legend: {
-                        orient: 'vertical',
-                        y: 'bottom',
-                        x: 'right',
-                        data: ['pm2.5'],
-                        textStyle: {
-                            color: '#fff'
-                        }
-                    },
                     GLMap: {
 
                     },
-
                     series: [
                     {
                         name: 'Evenings',
                         type: 'effectScatter',
                         coordinateSystem: 'GLMap',
                         data: data.filter(d => d.evening),
-                        symbolSize: 10,
+                        symbolSize: 7,
                         showEffectOn: 'render',
                         rippleEffect: {
                             brushType: 'stroke'
@@ -117,7 +90,7 @@
                             normal: {
                                 color: '#f4e925',
                                 opacity: 1,
-                                width: 1
+                                width: 2
                             }
                         },
                         zlevel: 1
