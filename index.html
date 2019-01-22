@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        .echartMap div {
+            position: absolute;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body style="height: 100%; margin: 0">
+    <div id="container" style="height: 100%"></div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0/echarts.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/0.52.0/mapbox-gl-dev.js'></script>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/0.52.0/mapbox-gl.css' rel='stylesheet' />
+    <script type="text/javascript" src="./echarts_layer.js"></script>
+    <script>
+        var map = new mapboxgl.Map({
+            container: 'container',
+            style: {
+                'version': 8,
+                'sources': {},
+                'layers': []
+            },
+            center: [0.9238313, 43.864227],
+
+            zoom: 5
+        })
+        map.addControl(new mapboxgl.NavigationControl())
+        map.on('load', function () {
+            map.addSource('google.tile', {
+                'type': 'raster',
+                'tiles': ['https://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}'],
+                'tileSize': 256
+            })
+            map.addLayer({
+                'id': 'google',
+                'type': 'raster',
+                'source': 'google.tile'
+            })
+
+            $.getJSON("output.json", function(data) {
+
+                var lines = [data].map(function (track) {
+                    return {
+                        coords: track.map(function (seg, idx) {
+                            return seg.value;
+                        })
+                    };
+                });
+            
+
+                option = {
+                   
+                    title: {
+                        text: 'Voyage en vélo cargo électrique',
+                        link: 'https://gouach.com/blogs/infos/voyage-en-velo-cargo',
+                        left: 'center',
+                        textStyle: {
+                            color: '#fff'
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        y: 'bottom',
+                        x: 'right',
+                        data: ['pm2.5'],
+                        textStyle: {
+                            color: '#fff'
+                        }
+                    },
+                    GLMap: {
+
+                    },
+
+                    series: [
+                    {
+                        name: 'Evenings',
+                        type: 'effectScatter',
+                        coordinateSystem: 'GLMap',
+                        data: data.filter(d => d.evening),
+                        symbolSize: 10,
+                        showEffectOn: 'render',
+                        rippleEffect: {
+                            brushType: 'stroke'
+                        },
+                        hoverAnimation: true,
+                        label: {
+                            normal: {
+                                formatter: '{b}',
+                                position: 'right',
+                                show: true
+                            }
+                        },
+                        itemStyle: {
+                            normal: {
+                                color: '#f4e925',
+                                shadowBlur: 10,
+                                shadowColor: '#333'
+                            }
+                        },
+                        zlevel: 1
+                    },
+                    {
+                        type: 'lines',
+                        coordinateSystem: 'GLMap',
+                        data: lines,
+                        polyline: true,
+                        lineStyle: {
+                            normal: {
+                                color: '#f4e925',
+                                opacity: 1,
+                                width: 1
+                            }
+                        },
+                        zlevel: 1
+                    }
+                    ]
+                };
+
+                var echartslayer = new EchartsLayer(map);
+                echartslayer.chart.setOption(option);
+            })
+
+        })
+    </script>
+</body>
+
+</html>
